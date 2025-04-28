@@ -1,0 +1,24 @@
+[project]
+name = "music21_svs_formats"
+version = "0.0.1"
+authors = [
+  { name="Oxygen Dioxide", email="oxygen-dioxide@outlook.com" },
+]
+description = "Support for singing voice synthesis file formats in music21 via libresvip"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "libresvip",
+  "music21",
+  "py_linq",
+]
+
+[project.urls]
+Homepage = "https://github.com/oxygen-dioxide/music21-svs-formats"
+Issues = "https://github.com/oxygen-dioxide/music21-svs-formats/issues"

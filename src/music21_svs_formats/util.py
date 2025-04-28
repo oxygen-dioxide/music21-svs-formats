@@ -1,0 +1,1 @@
+RESOLUTION = 480 # ticks per quarter note
