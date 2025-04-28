@@ -25,17 +25,12 @@ def parseTrack(lTrack:libresvip.model.base.SingingTrack) -> music21.stream.base.
     mPart = music21.stream.base.Part()
     currTick:int = 0
     for lNote in lTrack.note_list:
-        if(lNote.start_pos < currTick):
-            raise ValueError("Overlapping notes found")
-        if(lNote.start_pos > currTick):
-            mPart.append(music21.note.Rest((lNote.start_pos - currTick)/util.RESOLUTION))
         mNote = music21.note.Note(
             lNote.key_number,
             duration=music21.duration.Duration(lNote.length/util.RESOLUTION),
             lyric=lNote.lyric,
         )
-        mPart.append(mNote)
-        currTick = lNote.end_pos
+        mPart.insert(lNote.start_pos/util.RESOLUTION, mNote)
     mPart.partName = lTrack.title
     return mPart
 
@@ -109,6 +104,10 @@ def parseProject(lProject:libresvip.model.base.Project) -> music21.stream.Score:
         rightAccidental = key.accidentalByStep(nStep)
         mNote.pitch.accidental = rightAccidental
     
+    for mPart in mScore.parts:
+        mPart.makeMeasures(inPlace=True)
+    mScore.makeTies(inPlace=True)
+    mScore.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
     return mScore
 
 
