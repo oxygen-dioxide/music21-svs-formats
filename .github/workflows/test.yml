@@ -1,0 +1,47 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os.runs-on }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: 
+          - runs-on: windows-latest
+            arch: win-x64
+          - runs-on: windows-11-arm
+            arch: win-arm64
+          - runs-on: macos-15-intel
+            arch: osx-x64
+          - runs-on: macos-latest
+            arch: osx-arm64
+          - runs-on: ubuntu-latest
+            arch: linux-x64
+          - runs-on: ubuntu-24.04-arm
+            arch: linux-arm64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[test]"
+
+      - name: Run pytest
+        run: pytest
