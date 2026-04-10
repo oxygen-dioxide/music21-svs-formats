@@ -26,7 +26,9 @@ def midi_compare():
         midi2 = pretty_midi.PrettyMIDI(str(midi_path2))
 
         # Compare the number of instruments
-        assert len(midi1.instruments) == len(midi2.instruments), "Number of instruments mismatch"
+        assert len(midi1.instruments) == len(midi2.instruments), (
+            "Number of instruments mismatch"
+        )
 
         # Compare each instrument
         for inst1, inst2 in zip(midi1.instruments, midi2.instruments):
@@ -49,8 +51,8 @@ def prepare_midi():
         midi.tracks.append(track)
 
         for tone in tones:
-            note_on = mido.Message('note_on', note=tone, velocity=64, time=0)
-            note_off = mido.Message('note_off', note=tone, velocity=64, time=480)
+            note_on = mido.Message("note_on", note=tone, velocity=64, time=0)
+            note_off = mido.Message("note_off", note=tone, velocity=64, time=480)
             track.append(note_on)
             track.append(note_off)
 
@@ -63,12 +65,14 @@ def prepare_midi():
 def convert_and_compare(converter, env, midi_compare):
     def _convert_and_compare(orig_file_path: pathlib.Path):
         dest_file_path = env.getTempFile(suffix=".mid")
-        
+
         m_score = converter.parseFile(orig_file_path)
         m_score.write("midi", fp=dest_file_path)
 
-        assert dest_file_path.exists(), f"Converted file {dest_file_path} does not exist."
-        
+        assert dest_file_path.exists(), (
+            f"Converted file {dest_file_path} does not exist."
+        )
+
         midi_compare(orig_file_path, dest_file_path)
         dest_file_path.unlink()
 
@@ -78,7 +82,7 @@ def convert_and_compare(converter, env, midi_compare):
 def test_external_midi(converter, env, midi_compare):
     test_resources_path = pathlib.Path(__file__).parent / "resources"
     file_names = ["music21-test01.mid"]
-    
+
     for file_name in file_names:
         orig_file_path = test_resources_path / file_name
         dest_file_path = env.getTempFile(suffix=".mid")
@@ -86,8 +90,10 @@ def test_external_midi(converter, env, midi_compare):
         m_score = converter.parseFile(orig_file_path)
         m_score.write("midi", fp=dest_file_path)
 
-        assert dest_file_path.exists(), f"Converted file {dest_file_path} does not exist."
-        
+        assert dest_file_path.exists(), (
+            f"Converted file {dest_file_path} does not exist."
+        )
+
         midi_compare(orig_file_path, dest_file_path)
         dest_file_path.unlink()
 
@@ -95,7 +101,7 @@ def test_external_midi(converter, env, midi_compare):
 def test_empty_midi(env, prepare_midi, convert_and_compare):
     orig_file_path = env.getTempFile(suffix=".mid")
     prepare_midi([]).save(orig_file_path)
-    
+
     try:
         convert_and_compare(orig_file_path)
     finally:
@@ -106,11 +112,13 @@ def test_empty_midi(env, prepare_midi, convert_and_compare):
 
 @pytest.mark.parametrize("k", range(12))
 def test_scales(k, env, prepare_midi, convert_and_compare):
-    basic_scale = numpy.array([0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23], dtype=numpy.int32)
-    
+    basic_scale = numpy.array(
+        [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23], dtype=numpy.int32
+    )
+
     orig_file_path = env.getTempFile(suffix=".mid")
     prepare_midi(basic_scale + k + 48).save(orig_file_path)
-    
+
     try:
         convert_and_compare(orig_file_path)
     finally:
