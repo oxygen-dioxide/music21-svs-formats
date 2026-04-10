@@ -1,5 +1,6 @@
 #Convert libresvip.model.base.Project to music21.stream.Score
 
+import copy
 import music21
 import music21.stream.base
 import music21.meter.base
@@ -7,8 +8,9 @@ import libresvip
 import libresvip.model.base
 from music21_svs_formats import util
 import more_itertools
+from py_linq import Enumerable
 
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional
 
 def parseTimeSignature(lTimeSignature:libresvip.model.base.TimeSignature) -> music21.meter.base.TimeSignature:
     mTimeSignature = music21.meter.base.TimeSignature()
@@ -23,13 +25,30 @@ def parseTempo(lTempo:libresvip.model.base.SongTempo) -> music21.tempo.Metronome
 
 def parseTrack(lTrack:libresvip.model.base.SingingTrack) -> music21.stream.base.Part:
     mPart = music21.stream.base.Part()
-    currTick:int = 0
+    slurs: List[music21.note.Note] = []
+    prevmNote: Optional[music21.note.Note] = None
     for lNote in lTrack.note_list:
         mNote = music21.note.Note(
             lNote.key_number,
             duration=music21.duration.Duration(lNote.length/util.RESOLUTION),
-            lyric=lNote.lyric,
         )
+        if(lNote.lyric == "-"):# slur note
+            if(len(slurs) != 0):
+                slurs.append(mNote)
+            else:
+                if(prevmNote != None):
+                    slurs.append(prevmNote)
+                    slurs.append(mNote)
+        else:
+            if(len(slurs) > 0):
+                mPart.append(music21.spanner.Slur(slurs))
+                slurs.clear()
+            mNote.lyric = lNote.lyric
+            prevmNote = mNote
+        if(len(slurs) > 0):
+            mPart.append(music21.spanner.Slur(slurs))
+            slurs.clear()
+
         mPart.insert(lNote.start_pos/util.RESOLUTION, mNote)
     mPart.partName = lTrack.title
     return mPart
@@ -44,6 +63,24 @@ def scoreWiseInsert(
     for mPart in mScore.parts:
         mPart.insert(quarterPosition, object)
 
+def applyKey(mScore:music21.stream.base.Score, key:music21.key.KeySignature):
+    """
+    Apply the key signature to all parts of the score
+    """
+    numberToPitch = Enumerable(key.getPitches())\
+        .to_dictionary(lambda x: x.midi % 12, lambda x: x)
+    scoreWiseInsert(
+        mScore,
+        0,
+        key
+    )
+    for mNote in mScore.recurse().notes:
+        midi = mNote.pitch.midi
+        if(mNote.pitch.midi % 12 in numberToPitch):
+            destPitch = copy.deepcopy(numberToPitch[mNote.pitch.midi % 12])
+            destPitch.octave = destPitch.octave + (midi - destPitch.midi) // 12
+            mNote.pitch = destPitch
+            pass
 
 def parseProject(lProject:libresvip.model.base.Project) -> music21.stream.Score:
     mScore = music21.stream.base.Score()
@@ -92,21 +129,16 @@ def parseProject(lProject:libresvip.model.base.Project) -> music21.stream.Score:
 
     #Detect key
     #Singing synthesizer formats usually don't care about key, so we have to detect it.
-    key=mScore.analyze('key')
-    scoreWiseInsert(
-        mScore,
-        0,
-        key
-    )
-    #Apply key to each note
-    for mNote in mScore.recurse().notes:
-        nStep = mNote.pitch.step
-        rightAccidental = key.accidentalByStep(nStep)
-        mNote.pitch.accidental = rightAccidental
-    
+    try:
+        key=mScore.analyze('key')
+        applyKey(mScore, key)
+    except music21.analysis.discrete.DiscreteAnalysisException:
+        pass 
+
     for mPart in mScore.parts:
         mPart.makeMeasures(inPlace=True)
-    mScore.makeTies(inPlace=True)
+    if(len(mScore) > 0):
+        mScore.makeTies(inPlace=True)
     mScore.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
     return mScore
 

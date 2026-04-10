@@ -19,6 +19,12 @@ dependencies = [
   "py_linq",
 ]
 
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pretty_midi",
+]
+
 [project.urls]
 Homepage = "https://github.com/oxygen-dioxide/music21-svs-formats"
 Issues = "https://github.com/oxygen-dioxide/music21-svs-formats/issues"

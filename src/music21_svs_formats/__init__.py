@@ -8,18 +8,28 @@ from typing import List, Dict, Tuple
 
 from music21_svs_formats.converter import LibresvipSubConverter
 
-def registLibresvipPlugin(format:str, plugin:libresvip.extension.base.SVSConverterBase):
-    subConverter = types.new_class("libresvip_ustx", (LibresvipSubConverter,), {}, lambda ns: ns.update({
+def libresvipSubConverter(format:str, plugin:libresvip.extension.base.SVSConverter):
+    return types.new_class("libresvip_ustx", (LibresvipSubConverter,), {}, lambda ns: ns.update({
         "extension": format,
         "plugin_object": plugin,
         "registerFormats": (format,),
         "registerInputExtensions": (format,),
         "registerOutputExtensions": (format,)
     }))
+
+def getSubConverterByFormat(format:str):
+    if(format not in plugin_manager.plugins["svs"]):
+        raise ValueError(f"Format {format} is not supported by libresvip.")
+    plugin = plugin_manager.plugins["svs"][format]
+    return libresvipSubConverter(format, plugin)
+
+def registLibresvipPlugin(format:str, plugin:libresvip.extension.base.SVSConverter):
+    subConverter = libresvipSubConverter(format, plugin)
     music21.converter.registerSubConverter(subConverter)
 
 def registFormat(format:str):
-    registLibresvipPlugin(format, plugin_manager.plugin_registry[format].plugin_object)
+    subConverter = getSubConverterByFormat(format)
+    music21.converter.registerSubConverter(subConverter)
 
 def registAllFormats():
     music21_builtin_formats = Enumerable(music21.converter.Converter().subConvertersList('input'))\
