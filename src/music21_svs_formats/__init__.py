@@ -2,16 +2,19 @@ import types
 import music21
 import music21.converter
 import libresvip
+import libresvip.extension.base
 from libresvip.extension.manager import plugin_manager
-from py_linq import Enumerable
+from types_linq import Enumerable
 from typing import List, Dict, Tuple
 
 from music21_svs_formats.converter import LibresvipSubConverter
 
 
-def libresvipSubConverter(format: str, plugin: libresvip.extension.base.SVSConverter):
+def libresvipSubConverter(
+    format: str, plugin: libresvip.extension.base.SVSConverter
+) -> LibresvipSubConverter:
     return types.new_class(
-        "libresvip_ustx",
+        "libresvip_" + format,
         (LibresvipSubConverter,),
         {},
         lambda ns: ns.update(
@@ -49,7 +52,7 @@ def registAllFormats():
         .select_many(lambda x: x.registerInputExtensions)
         .to_list()
     )
-    for x in Enumerable(plugin_manager.plugin_registry.keys()).where(
+    for x in Enumerable(plugin_manager.plugins["svs"].keys()).where(
         lambda x: x not in music21_builtin_formats
     ):
-        registLibresvipPlugin(x, plugin_manager.plugin_registry[x].plugin_object)
+        registLibresvipPlugin(x, plugin_manager.plugins["svs"][x])

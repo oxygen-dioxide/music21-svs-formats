@@ -16,7 +16,7 @@ classifiers = [
 dependencies = [
   "libresvip",
   "music21",
-  "py_linq",
+  "types_linq",
 ]
 
 [project.optional-dependencies]
@@ -28,3 +28,6 @@ test = [
 [project.urls]
 Homepage = "https://github.com/oxygen-dioxide/music21-svs-formats"
 Issues = "https://github.com/oxygen-dioxide/music21-svs-formats/issues"
+
+[tool.setuptools.package-data]
+music21_svs_formats = ["py.typed"]
