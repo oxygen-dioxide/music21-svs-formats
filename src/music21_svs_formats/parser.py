@@ -8,7 +8,7 @@ import libresvip
 import libresvip.model.base
 from music21_svs_formats import util
 import more_itertools
-from py_linq import Enumerable
+from types_linq import Enumerable
 
 from typing import List, Tuple, Dict, Optional
 
