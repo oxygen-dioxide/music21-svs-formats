@@ -42,6 +42,7 @@ def midi_parse_and_compare(midi_converter, env, midi_compare):
 
         midi_compare(orig_file_path, dest_file_path)
         dest_file_path.unlink()
+        return m_score
 
     return _midi_parse_and_compare
 
@@ -81,7 +82,12 @@ def test_scales(k, env, prepare_midi, midi_parse_and_compare):
     prepare_midi(basic_scale + k + 48).save(orig_file_path)
 
     try:
-        midi_parse_and_compare(orig_file_path)
+        m_score = midi_parse_and_compare(orig_file_path)
+        kss = m_score.flatten().getElementsByClass(music21.key.KeySignature)
+        assert len(kss) == 1, "There should be exactly one key signature in the score."
+        assert kss[0].asKey().getRelativeMajor().getTonic().midi % 12 == k, (
+            "The key signature should correspond to the correct tonic."
+        )
     finally:
         if orig_file_path.exists():
             orig_file_path.unlink()

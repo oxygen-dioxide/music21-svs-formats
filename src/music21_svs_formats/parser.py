@@ -71,11 +71,11 @@ def scoreWiseInsert(
         mPart.insert(quarterPosition, object)
 
 
-def applyKey(mScore: music21.stream.base.Score, key: music21.key.KeySignature):
+def applyKey(mScore: music21.stream.base.Score, key: music21.key.Key):
     """
     Apply the key signature to all parts of the score
     """
-    numberToPitch = Enumerable(key.getPitches()).to_dictionary(
+    numberToPitch = Enumerable(key.getPitches()).to_dict(
         lambda x: x.midi % 12, lambda x: x
     )
     scoreWiseInsert(mScore, 0, key)

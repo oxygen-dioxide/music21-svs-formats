@@ -11,8 +11,15 @@ from music21_svs_formats.converter import LibresvipSubConverter
 
 
 def libresvipSubConverter(
-    format: str, plugin: libresvip.extension.base.SVSConverter
-) -> LibresvipSubConverter:
+    format: str, plugin: type[libresvip.extension.base.SVSConverter]
+) -> type[LibresvipSubConverter]:
+    """
+    Create a music21.converter.subConverters.SubConverter class for the given format and plugin.
+    format: file extension without dot, such as mid
+    plugin: a libresvip converter plugin object
+    """
+    can_input = not issubclass(plugin, libresvip.extension.base.WriteOnlyConverterMixin)
+    can_output = not issubclass(plugin, libresvip.extension.base.ReadOnlyConverterMixin)
     return types.new_class(
         "libresvip_" + format,
         (LibresvipSubConverter,),
@@ -22,8 +29,8 @@ def libresvipSubConverter(
                 "extension": format,
                 "plugin_object": plugin,
                 "registerFormats": (format,),
-                "registerInputExtensions": (format,),
-                "registerOutputExtensions": (format,),
+                "registerInputExtensions": (format,) * can_input,
+                "registerOutputExtensions": (format,) * can_output,
             }
         ),
     )
@@ -36,7 +43,9 @@ def getSubConverterByFormat(format: str):
     return libresvipSubConverter(format, plugin)
 
 
-def registLibresvipPlugin(format: str, plugin: libresvip.extension.base.SVSConverter):
+def registLibresvipPlugin(
+    format: str, plugin: type[libresvip.extension.base.SVSConverter]
+):
     subConverter = libresvipSubConverter(format, plugin)
     music21.converter.registerSubConverter(subConverter)
 
