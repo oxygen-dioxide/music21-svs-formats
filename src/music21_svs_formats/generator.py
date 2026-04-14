@@ -23,7 +23,7 @@ def mTimeDistinct(stream: music21.stream.base.Stream):
 
 
 def dumpNote(
-    mNote: music21.note.Note, mPart: music21.stream.base.Part
+    mNote: music21.note.Note, mPart: music21.stream.base.Stream
 ) -> libresvip.model.base.Note:
     """
     Convert music21.note.Note to libresvip.model.base.Note
