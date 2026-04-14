@@ -95,7 +95,7 @@ def parseProject(lProject: libresvip.model.base.Project) -> music21.stream.Score
         if isinstance(lTrack, libresvip.model.base.SingingTrack):
             mScore.append(parseTrack(lTrack))
     # parse time signatures
-    quarterPosition = 0
+    quarterPosition: float = 0
     lTimeSignatures = lProject.time_signature_list
     if len(lTimeSignatures) == 0 or lTimeSignatures[0].bar_index > 0:
         lTimeSignatures = [libresvip.model.base.TimeSignature()] + lTimeSignatures

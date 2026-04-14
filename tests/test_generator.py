@@ -40,4 +40,23 @@ def test_corpus_midi_generate(name, midi_generate_and_compare):
     midi_generate_and_compare(mScore)
 
 
+def test_empty_midi_generate(midi_generate_and_compare):
+    mScore = music21.stream.Score()
+    midi_generate_and_compare(mScore)
+
+
+def test_duplicate_tempo(midi_generate_and_compare):
+    mScore = music21.stream.Stream(
+        [
+            music21.tempo.MetronomeMark(60),
+            music21.tempo.MetronomeMark(70),
+            music21.note.Note(60, quarterLength=4),
+            music21.tempo.MetronomeMark(80),
+            music21.tempo.MetronomeMark(90),
+            music21.note.Note(62, quarterLength=4),
+        ]
+    )
+    midi_generate_and_compare(mScore)
+
+
 # music21内置的midi解析器会将音符时值量化，无法保留原始midi文件中的时值信息。

@@ -32,3 +32,6 @@ Issues = "https://github.com/oxygen-dioxide/music21-svs-formats/issues"
 
 [tool.setuptools.package-data]
 music21_svs_formats = ["py.typed"]
+
+[tool.mypy]
+plugins = ['pydantic.mypy']

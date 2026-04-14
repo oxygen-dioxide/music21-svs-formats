@@ -17,7 +17,7 @@ def mTimeDistinct(stream: music21.stream.base.Stream):
     todelete: List[music21.base.Music21Object] = []
     for prev, curr in more_itertools.pairwise(stream):
         if prev.getOffsetBySite(stream) == curr.getOffsetBySite(stream):
-            todelete.append(prev)
+            todelete.append(curr)
     for obj in todelete:
         stream.remove(obj)
 
@@ -40,12 +40,13 @@ def dumpNote(
     return lNote
 
 
-def dumpTrack(mPart: music21.stream.base.Part) -> libresvip.model.base.SingingTrack:
+def dumpTrack(mPart: music21.stream.base.Stream) -> libresvip.model.base.SingingTrack:
     """
     Convert music21.stream.base.Part to libresvip.model.base.SingingTrack
     """
     lTrack = libresvip.model.base.SingingTrack()
-    lTrack.title = mPart.partName
+    if hasattr(mPart, "partName") and mPart.partName:
+        lTrack.title = mPart.partName
     mPart = mPart.flatten().stripTies()
     for mGeneralNote in mPart.notesAndRests:
         if isinstance(mGeneralNote, music21.note.Note):
@@ -61,9 +62,14 @@ def dumpProject(mScore: music21.stream.base.Score) -> libresvip.model.base.Proje
     Convert music21.stream.Score to libresvip.model.base.Project
     """
     lProject = libresvip.model.base.Project()
-    lProject.track_list = [dumpTrack(mPart) for mPart in mScore.parts]
+    if hasattr(mScore, "parts"):
+        lProject.track_list = [dumpTrack(mPart) for mPart in mScore.parts]
+    else:
+        lProject.track_list = [dumpTrack(mScore)]
     flattenedScore = mScore.flatten()
-    mTempos = flattenedScore.getElementsByClass(music21.tempo.MetronomeMark)
+    mTempos = music21.stream.Stream(
+        flattenedScore.getElementsByClass(music21.tempo.MetronomeMark)
+    )
     mTimeDistinct(mTempos)
     lProject.song_tempo_list = (
         Enumerable(mTempos)

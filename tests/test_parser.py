@@ -60,7 +60,7 @@ def test_external_midi_parse(file_name, midi_parse_and_compare):
     midi_parse_and_compare(orig_file_path)
 
 
-def test_empty_midi(env, prepare_midi, midi_parse_and_compare):
+def test_empty_midi_parse(env, prepare_midi, midi_parse_and_compare):
     orig_file_path = env.getTempFile(suffix=".mid")
     prepare_midi([]).save(orig_file_path)
 
