@@ -4,7 +4,6 @@ from music21_svs_formats import parser
 from music21_svs_formats import generator
 import pathlib
 from typing import List, Dict, Tuple, Optional
-from typing import get_type_hints
 
 
 class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
@@ -15,8 +14,7 @@ class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
         self, filePath: str | pathlib.Path, number: Optional[int] = None, **keywords
     ) -> music21.stream.Score:
         filePath = pathlib.Path(filePath)
-        input_option = get_type_hints(self.plugin_object.load).get("options")()
-        lProject = self.plugin_object.load(filePath, input_option)
+        lProject = self.plugin_object.load(filePath, {})
         mScore = parser.parseProject(lProject)
         self.stream = mScore
         return mScore
@@ -39,6 +37,5 @@ class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
         lProject = generator.dumpProject(obj)
         if fp is None:
             fp = self.getTemporaryFile()
-        output_option = get_type_hints(self.plugin_object.dump).get("options")()
-        self.plugin_object.dump(pathlib.Path(fp), lProject, output_option)
+        self.plugin_object.dump(pathlib.Path(fp), lProject, {})
         return fp

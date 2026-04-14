@@ -85,7 +85,7 @@ def unregistFormat(format: str):
         raise ConverterException(f"Format {format} is not registered.")
     subConverter = subConverters[format]
     if subConverter not in music21.converter.Converter().subConvertersList():
-        warning.warn(
+        warnings.warn(
             f"Format {format} is not registered in music21.converter.Converter."
         )
     music21.converter.unregisterSubConverter(subConverter)
