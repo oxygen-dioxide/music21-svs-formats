@@ -38,6 +38,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install libresvip development version
+        run: pip install git+https://github.com/SoulMelody/LibreSVIP@6f58fd611aa83134e588bde10610f7e80558dda8
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
