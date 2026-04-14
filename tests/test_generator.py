@@ -3,7 +3,6 @@ import music21_svs_formats
 import music21
 import mido
 import pretty_midi
-import numpy
 import pytest
 
 from typing import Iterable

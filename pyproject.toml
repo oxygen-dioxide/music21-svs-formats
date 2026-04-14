@@ -23,6 +23,7 @@ dependencies = [
 test = [
   "pytest",
   "pretty_midi",
+  "numpy",
 ]
 
 [project.urls]
