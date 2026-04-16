@@ -3,7 +3,7 @@ import libresvip
 from music21_svs_formats import parser
 from music21_svs_formats import generator
 import pathlib
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Iterable
 
 
 class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
@@ -33,7 +33,14 @@ class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
             fp.write_bytes(dataStr)
         return self.parseFile(fp, number)
 
-    def write(self, obj, fmt, fp=None, subformats=(), **keywords):
+    def write(
+        self,
+        obj: music21.base.Music21Object,
+        fmt: str | None,
+        fp: str | pathlib.Path | None = None,
+        subformats: Iterable[str] = (),
+        **keywords,
+    ):
         lProject = generator.dumpProject(obj)
         if fp is None:
             fp = self.getTemporaryFile()

@@ -67,7 +67,7 @@ def dumpProject(mScore: music21.stream.base.Score) -> libresvip.model.base.Proje
     else:
         lProject.track_list = [dumpTrack(mScore)]
     flattenedScore = mScore.flatten()
-    mTempos:music21.stream.Stream[music21.tempo.MetronomeMark] = music21.stream.Stream(
+    mTempos: music21.stream.Stream[music21.tempo.MetronomeMark] = music21.stream.Stream(
         flattenedScore.getElementsByClass(music21.tempo.MetronomeMark)
     )
     mTimeDistinct(mTempos)

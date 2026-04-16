@@ -50,11 +50,11 @@ def parseTrack(lTrack: libresvip.model.base.SingingTrack) -> music21.stream.base
                 slurs.clear()
             mNote.lyric = lNote.lyric
             prevmNote = mNote
-        if len(slurs) > 0:
-            mPart.append(music21.spanner.Slur(slurs))
-            slurs.clear()
-
         mPart.insert(lNote.start_pos / util.RESOLUTION, mNote)
+
+    if len(slurs) > 0:
+        mPart.append(music21.spanner.Slur(slurs))
+        slurs.clear()
     mPart.partName = lTrack.title
     return mPart
 
@@ -85,7 +85,7 @@ def applyKey(mScore: music21.stream.base.Score, key: music21.key.Key):
             destPitch = copy.deepcopy(numberToPitch[mNote.pitch.midi % 12])
             destPitch.octave = destPitch.octave + (midi - destPitch.midi) // 12
             mNote.pitch = destPitch
-            pass
+    mScore.makeNotation(inPlace=True)
 
 
 def parseProject(lProject: libresvip.model.base.Project) -> music21.stream.Score:

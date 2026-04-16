@@ -29,31 +29,32 @@ def get_music21_input_formats():
 
 
 def test_regist(get_music21_output_formats, get_music21_input_formats):
-    music21_svs_formats.registAllFormats()
-    outputFormats = get_music21_output_formats()
-    inputFormats = get_music21_input_formats()
-    assert "ustx" in outputFormats
-    assert "ustx" in inputFormats
-    assert "lrc" in outputFormats
-    assert "lrc" not in inputFormats
+    try:
+        music21_svs_formats.registAllFormats()
+        outputFormats = get_music21_output_formats()
+        inputFormats = get_music21_input_formats()
+        assert "ustx" in outputFormats
+        assert "ustx" in inputFormats
+        assert "lrc" in outputFormats
+        assert "lrc" not in inputFormats
 
-    music21_svs_formats.unregistFormat("ustx")
-    outputFormats = get_music21_output_formats()
-    inputFormats = get_music21_input_formats()
-    assert "ustx" not in outputFormats
-    assert "ustx" not in inputFormats
-    assert "lrc" in outputFormats
-    assert "lrc" not in inputFormats
+        music21_svs_formats.unregistFormat("ustx")
+        outputFormats = get_music21_output_formats()
+        inputFormats = get_music21_input_formats()
+        assert "ustx" not in outputFormats
+        assert "ustx" not in inputFormats
+        assert "lrc" in outputFormats
+        assert "lrc" not in inputFormats
 
-    music21_svs_formats.unregistAllFormats()
-    outputFormats = get_music21_output_formats()
-    inputFormats = get_music21_input_formats()
-    assert "ustx" not in outputFormats
-    assert "ustx" not in inputFormats
-    assert "lrc" not in outputFormats
-    assert "lrc" not in inputFormats
-
-    music21.converter.resetSubConverters()
+        music21_svs_formats.unregistAllFormats()
+        outputFormats = get_music21_output_formats()
+        inputFormats = get_music21_input_formats()
+        assert "ustx" not in outputFormats
+        assert "ustx" not in inputFormats
+        assert "lrc" not in outputFormats
+        assert "lrc" not in inputFormats
+    finally:
+        music21.converter.resetSubConverters()
 
 
 def test_invalid_format():
