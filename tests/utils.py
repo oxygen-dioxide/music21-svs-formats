@@ -23,17 +23,17 @@ def midi_compare():
 
         # Compare the number of instruments
         assert len(midi1.instruments) == len(midi2.instruments), (
-            "Number of instruments mismatch"
+            f"Number of instruments mismatch: {len(midi1.instruments)} vs {len(midi2.instruments)}"
         )
 
         # Compare each instrument
         for inst1, inst2 in zip(midi1.instruments, midi2.instruments):
-            assert len(inst1.notes) == len(inst2.notes), "Number of notes mismatch"
+            assert len(inst1.notes) == len(inst2.notes), f"Number of notes mismatch: {len(inst1.notes)} vs {len(inst2.notes)}"
 
             # Compare each note
             for note1, note2 in zip(inst1.notes, inst2.notes):
-                assert note1.pitch == note2.pitch, "Pitch mismatch"
-                assert note1.start == note2.start, "Start time mismatch"
-                assert note1.end == note2.end, "End time mismatch"
+                assert note1.pitch == note2.pitch, f"Pitch mismatch: {note1.pitch} vs {note2.pitch}"
+                assert note1.start == note2.start, f"Start time mismatch: {note1.start} vs {note2.start}"
+                assert note1.end == note2.end, f"End time mismatch: {note1.end} vs {note2.end}"
 
     return _compare

@@ -23,7 +23,7 @@ def mTimeDistinct(stream: music21.stream.base.Stream):
 
 
 def dumpNote(
-    mNote: music21.note.Note, mPart: music21.stream.base.Stream
+    mNote: music21.note.Note, mPart: music21.stream.base.Stream, isSlur: bool = False
 ) -> libresvip.model.base.Note:
     """
     Convert music21.note.Note to libresvip.model.base.Note
@@ -35,8 +35,14 @@ def dumpNote(
     )
     lNote.length = endTick - lNote.start_pos
     lNote.key_number = mNote.pitch.midi
-    if mNote.lyric is not None:
-        lNote.lyric = mNote.lyric
+    if mNote.lyrics:
+        mLyric = mNote.lyrics[0]
+        if(mLyric.syllabic == "single" or mLyric.syllabic == "begin"):
+            lNote.lyric = mLyric.text
+        else:
+            lNote.lyric = "-" + mLyric.text
+    elif isSlur:
+        lNote.lyric = "-"
     return lNote
 
 
@@ -48,25 +54,49 @@ def dumpTrack(mPart: music21.stream.base.Stream) -> libresvip.model.base.Singing
     if hasattr(mPart, "partName") and mPart.partName:
         lTrack.title = mPart.partName
     mPart = mPart.flatten().stripTies()
+    slurNotes = Enumerable(mPart.getElementsByClass(music21.spanner.Slur))\
+        .where(lambda x: len(x.getSpannedElements()) > 1)\
+        .select_many(lambda x: x.getSpannedElements()[1:])\
+        .to_set()
     for mGeneralNote in mPart.notesAndRests:
         if isinstance(mGeneralNote, music21.note.Note):
-            lTrack.note_list.append(dumpNote(mGeneralNote, mPart))
+            isSlur = mGeneralNote in slurNotes
+            lTrack.note_list.append(dumpNote(mGeneralNote, mPart, isSlur))
         elif isinstance(mGeneralNote, music21.chord.Chord):
             for mNote in mGeneralNote.notes:
-                lTrack.note_list.append(dumpNote(mNote, mPart))
+                isSlur = mNote in slurNotes or mGeneralNote in slurNotes
+                lTrack.note_list.append(dumpNote(mNote, mPart, isSlur))
+    
+    # Convert vocaloid-style multisyllabic lyric to SynthV-style multisyllabic lyric
+    # example: `walk` `-ing` -> `walking` `+`
+    if(len(lTrack.note_list) > 1):
+        wordStart = lTrack.note_list[0]
+        for lNote in lTrack.note_list:
+            if lNote.lyric == "-":
+                continue
+            elif lNote.lyric.startswith("-"):
+                lNote.lyric = "+"
+                wordStart.lyric = wordStart.lyric + lNote.lyric[1:]
+            else:
+                wordStart = lNote
     return lTrack
 
 
-def dumpProject(mScore: music21.stream.base.Score) -> libresvip.model.base.Project:
+def dumpProject(mObject: music21.base.Music21Object) -> libresvip.model.base.Project:
     """
     Convert music21.stream.Score to libresvip.model.base.Project
     """
-    lProject = libresvip.model.base.Project()
-    if hasattr(mScore, "parts"):
-        lProject.track_list = [dumpTrack(mPart) for mPart in mScore.parts]
+    if(isinstance(mObject, music21.stream.base.Stream)):
+        mStream = mObject
     else:
-        lProject.track_list = [dumpTrack(mScore)]
-    flattenedScore = mScore.flatten()
+        mStream = music21.stream.Stream()
+        mStream.insert(0, mObject)
+    lProject = libresvip.model.base.Project()
+    if hasattr(mStream, "parts"): # mStream is a Score
+        lProject.track_list = [dumpTrack(mPart) for mPart in mStream.parts]
+    else:
+        lProject.track_list = [dumpTrack(mStream)]
+    flattenedScore = mStream.flatten()
     mTempos: music21.stream.Stream[music21.tempo.MetronomeMark] = music21.stream.Stream(
         flattenedScore.getElementsByClass(music21.tempo.MetronomeMark)
     )
