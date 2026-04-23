@@ -1,0 +1,1 @@
+pyphen库拒绝类型标注贡献（https://github.com/Kozea/Pyphen/pull/81/changes）。目前有PR正在将类型标注贡献给typeshed（https://github.com/python/typeshed/pull/15645/changes），尚未合并。

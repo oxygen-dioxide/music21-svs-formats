@@ -41,12 +41,8 @@ ruff format
 ### Development Installation
 
 ```bash
-# Install libreSVIP development version (PyPI v2.3.1 has a bug that causes tests to fail, fixed in dev)
-pip install git+https://github.com/SoulMelody/LibreSVIP@6f58fd611aa83134e588bde10610f7e80558dda8
-
 # Install in editable mode with test dependencies
 pip install -e ".[test]"
-
 ```
 
 ### VS Code Integration
