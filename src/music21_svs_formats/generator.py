@@ -37,7 +37,7 @@ def dumpNote(
     lNote.key_number = mNote.pitch.midi
     if mNote.lyrics:
         mLyric = mNote.lyrics[0]
-        if(mLyric.syllabic == "single" or mLyric.syllabic == "begin"):
+        if mLyric.syllabic == "single" or mLyric.syllabic == "begin":
             lNote.lyric = mLyric.text
         else:
             lNote.lyric = "-" + mLyric.text
@@ -54,10 +54,12 @@ def dumpTrack(mPart: music21.stream.base.Stream) -> libresvip.model.base.Singing
     if hasattr(mPart, "partName") and mPart.partName:
         lTrack.title = mPart.partName
     mPart = mPart.flatten().stripTies()
-    slurNotes = Enumerable(mPart.getElementsByClass(music21.spanner.Slur))\
-        .where(lambda x: len(x.getSpannedElements()) > 1)\
-        .select_many(lambda x: x.getSpannedElements()[1:])\
+    slurNotes = (
+        Enumerable(mPart.getElementsByClass(music21.spanner.Slur))
+        .where(lambda x: len(x.getSpannedElements()) > 1)
+        .select_many(lambda x: x.getSpannedElements()[1:])
         .to_set()
+    )
     for mGeneralNote in mPart.notesAndRests:
         if isinstance(mGeneralNote, music21.note.Note):
             isSlur = mGeneralNote in slurNotes
@@ -66,10 +68,10 @@ def dumpTrack(mPart: music21.stream.base.Stream) -> libresvip.model.base.Singing
             for mNote in mGeneralNote.notes:
                 isSlur = mNote in slurNotes or mGeneralNote in slurNotes
                 lTrack.note_list.append(dumpNote(mNote, mPart, isSlur))
-    
+
     # Convert vocaloid-style multisyllabic lyric to SynthV-style multisyllabic lyric
     # example: `walk` `-ing` -> `walking` `+`
-    if(len(lTrack.note_list) > 1):
+    if len(lTrack.note_list) > 1:
         wordStart = lTrack.note_list[0]
         for lNote in lTrack.note_list:
             if lNote.lyric == "-":
@@ -86,13 +88,13 @@ def dumpProject(mObject: music21.base.Music21Object) -> libresvip.model.base.Pro
     """
     Convert music21.stream.Score to libresvip.model.base.Project
     """
-    if(isinstance(mObject, music21.stream.base.Stream)):
+    if isinstance(mObject, music21.stream.base.Stream):
         mStream = mObject
     else:
         mStream = music21.stream.Stream()
         mStream.insert(0, mObject)
     lProject = libresvip.model.base.Project()
-    if hasattr(mStream, "parts"): # mStream is a Score
+    if hasattr(mStream, "parts"):  # mStream is a Score
         lProject.track_list = [dumpTrack(mPart) for mPart in mStream.parts]
     else:
         lProject.track_list = [dumpTrack(mStream)]

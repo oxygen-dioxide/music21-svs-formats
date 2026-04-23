@@ -25,6 +25,7 @@ test = [
   "pretty_midi",
   "numpy",
 ]
+hyphen = ["pyphen"]
 
 [project.urls]
 Homepage = "https://github.com/oxygen-dioxide/music21-svs-formats"

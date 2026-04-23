@@ -11,8 +11,10 @@ import more_itertools
 from types_linq import Enumerable
 
 from typing import List, Tuple, Dict, Optional, TYPE_CHECKING
+
 if TYPE_CHECKING:
     import pyphen
+
 
 def parseTimeSignature(
     lTimeSignature: libresvip.model.base.TimeSignature,
@@ -28,31 +30,37 @@ def parseTempo(lTempo: libresvip.model.base.SongTempo) -> music21.tempo.Metronom
     mTempo.number = lTempo.bpm
     return mTempo
 
+
 def hyphen(lTrack: libresvip.model.base.SingingTrack, hyphenDict: "pyphen.Pyphen"):
     """
-    `listening` `+` -> `lis-` `-ten-` `-ing` 
+    `listening` `+` -> `lis-` `-ten-` `-ing`
     """
-    wordStart:libresvip.model.base.Note | None = None
-    placeHolderNotes:List[libresvip.model.base.Note] = []
-    
+    wordStart: libresvip.model.base.Note | None = None
+    placeHolderNotes: List[libresvip.model.base.Note] = []
+
     for lNote in lTrack.note_list:
-        if(lNote.lyric == "-"): # slur note, remain unchanged
+        if lNote.lyric == "-":  # slur note, remain unchanged
             continue
-        if(lNote.lyric == "+"):
+        if lNote.lyric == "+":
             placeHolderNotes.append(lNote)
         else:
             if wordStart and len(placeHolderNotes) > 0:
                 syllables = hyphenDict.inserted(wordStart.lyric).split("-")
                 if len(syllables) > len(placeHolderNotes) + 1:
-                    syllables[len(placeHolderNotes)] = "".join(syllables[len(placeHolderNotes):])
+                    syllables[len(placeHolderNotes)] = "".join(
+                        syllables[len(placeHolderNotes) :]
+                    )
                 syllables = "- -".join(syllables).split(" ")
                 wordStart.lyric = syllables[0]
-                for (note, syllable) in zip([wordStart] + placeHolderNotes, syllables):
+                for note, syllable in zip([wordStart] + placeHolderNotes, syllables):
                     note.lyric = syllable
             wordStart = lNote
             placeHolderNotes.clear()
 
-def parseTrack(lTrack: libresvip.model.base.SingingTrack, hyphenDict: "pyphen.Pyphen | None" = None) -> music21.stream.base.Part:
+
+def parseTrack(
+    lTrack: libresvip.model.base.SingingTrack, hyphenDict: "pyphen.Pyphen | None" = None
+) -> music21.stream.base.Part:
     if hyphenDict is not None:
         hyphen(lTrack, hyphenDict)
     mPart = music21.stream.base.Part()
@@ -114,7 +122,9 @@ def applyKey(mScore: music21.stream.base.Score, key: music21.key.Key):
     mScore.makeNotation(inPlace=True)
 
 
-def parseProject(lProject: libresvip.model.base.Project, hyphenDict: "pyphen.Pyphen | None" = None) -> music21.stream.Score:
+def parseProject(
+    lProject: libresvip.model.base.Project, hyphenDict: "pyphen.Pyphen | None" = None
+) -> music21.stream.Score:
     lProject = copy.deepcopy(lProject)
     mScore = music21.stream.base.Score()
     # parse tracks

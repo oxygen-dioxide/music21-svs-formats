@@ -12,18 +12,22 @@ class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
     plugin_object: libresvip.extension.base.SVSConverter
 
     def parseFile(
-        self, filePath: str | pathlib.Path, number: Optional[int] = None,
+        self,
+        filePath: str | pathlib.Path,
+        number: Optional[int] = None,
         hyphenDictPath: Optional[str | pathlib.Path] = None,
         hyphenLang: Optional[str] = None,
-        **keywords
+        **keywords,
     ) -> music21.stream.Score:
         filePath = pathlib.Path(filePath)
         lProject = self.plugin_object.load(filePath, {})
         if hyphenDictPath is not None:
             import pyphen
+
             hyphenDict = pyphen.Pyphen(filename=hyphenDictPath)
         elif hyphenLang is not None:
             import pyphen
+
             hyphenDict = pyphen.Pyphen(lang=hyphenLang)
         else:
             hyphenDict = None
@@ -56,6 +60,7 @@ class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
         lProject = generator.dumpProject(obj)
         if isinstance(fp, IOBase):
             from music21 import environment
+
             e = environment.Environment()
             file: pathlib.Path = e.getTempFile("." + self.extension)
             self.plugin_object.dump(file, lProject, {})
