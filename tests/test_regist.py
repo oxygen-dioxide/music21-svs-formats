@@ -30,6 +30,14 @@ def get_music21_input_formats():
 
 def test_regist(get_music21_output_formats, get_music21_input_formats):
     try:
+        music21_svs_formats.registFormat("ustx")
+        outputFormats = get_music21_output_formats()
+        inputFormats = get_music21_input_formats()
+        assert "ustx" in outputFormats
+        assert "ustx" in inputFormats
+        assert "lrc" not in outputFormats
+        assert "lrc" not in inputFormats
+
         music21_svs_formats.registAllFormats()
         outputFormats = get_music21_output_formats()
         inputFormats = get_music21_input_formats()
@@ -60,3 +68,5 @@ def test_regist(get_music21_output_formats, get_music21_input_formats):
 def test_invalid_format():
     with pytest.raises(ValueError):
         music21_svs_formats.getSubConverterByFormat("invalid_format")
+    with pytest.raises(music21_svs_formats.ConverterException):
+        music21_svs_formats.unregistFormat("invalid_format")

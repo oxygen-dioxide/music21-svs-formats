@@ -25,12 +25,6 @@ def parseTimeSignature(
     return mTimeSignature
 
 
-def parseTempo(lTempo: libresvip.model.base.SongTempo) -> music21.tempo.MetronomeMark:
-    mTempo = music21.tempo.MetronomeMark()
-    mTempo.number = lTempo.bpm
-    return mTempo
-
-
 def hyphen(lTrack: libresvip.model.base.SingingTrack, hyphenDict: "pyphen.Pyphen"):
     """
     `listening` `+` -> `lis-` `-ten-` `-ing`

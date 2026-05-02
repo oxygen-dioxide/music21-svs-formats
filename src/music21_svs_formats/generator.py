@@ -10,6 +10,10 @@ from types_linq import Enumerable
 from typing import List, Tuple, Dict
 
 
+class UnsupportedMusic21ObjectError(ValueError):
+    pass
+
+
 def mTimeDistinct(stream: music21.stream.base.Stream):
     """
     Remove duplicate time signatures or tempos that have the same offset.
@@ -65,9 +69,7 @@ def dumpTrack(mPart: music21.stream.base.Stream) -> libresvip.model.base.Singing
             isSlur = mGeneralNote in slurNotes
             lTrack.note_list.append(dumpNote(mGeneralNote, mPart, isSlur))
         elif isinstance(mGeneralNote, music21.chord.Chord):
-            for mNote in mGeneralNote.notes:
-                isSlur = mNote in slurNotes or mGeneralNote in slurNotes
-                lTrack.note_list.append(dumpNote(mNote, mPart, isSlur))
+            raise UnsupportedMusic21ObjectError("Chord is not supported by libresvip.")
 
     # Convert vocaloid-style multisyllabic lyric to SynthV-style multisyllabic lyric
     # example: `walk` `-ing` -> `walking` `+`

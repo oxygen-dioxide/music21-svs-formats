@@ -175,3 +175,4 @@ cython_debug/
 
 # My custom ones
 .vscode/
+*-autosave.ustx

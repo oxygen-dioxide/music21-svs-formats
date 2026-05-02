@@ -101,10 +101,21 @@ def test_multisyllable():
     assert len(m_score.parts) == 1, "There should be exactly one part in the score."
     part = m_score.parts[0]
     notes = list(part.flatten().notes)
-    assert len(notes) == 3, "There should be exactly three notes in the part."
 
-    expected_lyrics = ["lis", "ten", "ing"]
-    expected_lyric_syllabics = ["begin", "middle", "end"]
+    expected_lyrics = ["lis", "ten", None, None, "ing", "lis", "tening", None]
+    expected_lyric_syllabics = [
+        "begin",
+        "middle",
+        None,
+        None,
+        "end",
+        "begin",
+        "end",
+        None,
+    ]
+    assert len(notes) == len(expected_lyrics), (
+        f"There should be exactly {len(expected_lyrics)} notes in the part."
+    )
 
     for note, expected_lyric, expected_syllabic in zip(
         notes, expected_lyrics, expected_lyric_syllabics
@@ -112,6 +123,12 @@ def test_multisyllable():
         assert note.lyric == expected_lyric, (
             f"Expected lyric '{expected_lyric}' but got '{note.lyric}'"
         )
-        assert note.lyrics[0].syllabic == expected_syllabic, (
+        assert (
+            (note.lyrics[0].syllabic) if note.lyrics else None == expected_syllabic
+        ), (
             f"Expected syllabic '{expected_syllabic}' but got '{note.lyrics[0].syllabic}'"
         )
+    slurs = part.flatten().getElementsByClass("Slur")
+    assert len(slurs) == 2
+    assert len(slurs[0]) == 3
+    assert len(slurs[1]) == 2
