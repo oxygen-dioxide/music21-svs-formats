@@ -1,6 +1,6 @@
 [project]
 name = "music21_svs_formats"
-version = "0.0.1"
+dynamic = ["version"]
 authors = [
   { name="Oxygen Dioxide", email="oxygen-dioxide@outlook.com" },
 ]
@@ -37,3 +37,9 @@ music21_svs_formats = ["py.typed"]
 [tool.mypy]
 plugins = ['pydantic.mypy']
 mypy_path = "typings"
+
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
