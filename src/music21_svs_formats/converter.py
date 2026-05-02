@@ -47,7 +47,9 @@ class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
             fp.write_text(dataStr, encoding="utf-8")
         else:
             fp.write_bytes(dataStr)
-        return self.parseFile(fp, number)
+        result = self.parseFile(fp, number)
+        fp.unlink()  # delete the temporary file
+        return result
 
     def write(
         self,
@@ -65,8 +67,12 @@ class LibresvipSubConverter(music21.converter.subConverters.SubConverter):
             file: pathlib.Path = e.getTempFile("." + self.extension)
             self.plugin_object.dump(file, lProject, {})
             fp.write(file.read_bytes())
+            file.unlink()
             return fp
         if fp is None:
-            fp = self.getTemporaryFile()
+            from music21 import environment
+
+            e = environment.Environment()
+            fp = e.getTempFile("." + self.extension)
         self.plugin_object.dump(pathlib.Path(fp), lProject, {})
         return fp

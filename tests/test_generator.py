@@ -45,6 +45,17 @@ def test_empty_midi_generate(midi_generate_and_compare):
     midi_generate_and_compare(mScore)
 
 
+def test_midi_generate_non_filename(midi_converter, env, midi_compare):
+    mScore = music21.stream.Score()
+    path = midi_converter.write(mScore, "midi")
+    assert pathlib.Path(path).exists(), f"Generated MIDI file {path} does not exist."
+    expected_file_path = env.getTempFile(suffix=".mid")
+    mScore.write("midi", fp=expected_file_path)
+    midi_compare(expected_file_path, path)
+    expected_file_path.unlink()
+    path.unlink()
+
+
 def test_duplicate_tempo(midi_generate_and_compare):
     mScore = music21.stream.Stream(
         [
