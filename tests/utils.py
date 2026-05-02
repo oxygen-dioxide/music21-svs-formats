@@ -10,6 +10,10 @@ def midi_converter():
     return music21_svs_formats.getSubConverterByFormat("mid")()
 
 
+def ustx_converter():
+    return music21_svs_formats.getSubConverterByFormat("ustx")()
+
+
 @pytest.fixture
 def env():
     return music21.environment.Environment()

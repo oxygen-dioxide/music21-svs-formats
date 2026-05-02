@@ -38,24 +38,28 @@ def hyphen(lTrack: libresvip.model.base.SingingTrack, hyphenDict: "pyphen.Pyphen
     wordStart: libresvip.model.base.Note | None = None
     placeHolderNotes: List[libresvip.model.base.Note] = []
 
+    def handleWord():
+        if wordStart and len(placeHolderNotes) > 0:
+            syllables = hyphenDict.inserted(wordStart.lyric).split("-")
+            if len(syllables) > len(placeHolderNotes) + 1:
+                syllables[len(placeHolderNotes)] = "".join(
+                    syllables[len(placeHolderNotes) :]
+                )
+            syllables = "- -".join(syllables).split(" ")
+            wordStart.lyric = syllables[0]
+            for note, syllable in zip([wordStart] + placeHolderNotes, syllables):
+                note.lyric = syllable
+
     for lNote in lTrack.note_list:
         if lNote.lyric == "-":  # slur note, remain unchanged
             continue
         if lNote.lyric == "+":
             placeHolderNotes.append(lNote)
         else:
-            if wordStart and len(placeHolderNotes) > 0:
-                syllables = hyphenDict.inserted(wordStart.lyric).split("-")
-                if len(syllables) > len(placeHolderNotes) + 1:
-                    syllables[len(placeHolderNotes)] = "".join(
-                        syllables[len(placeHolderNotes) :]
-                    )
-                syllables = "- -".join(syllables).split(" ")
-                wordStart.lyric = syllables[0]
-                for note, syllable in zip([wordStart] + placeHolderNotes, syllables):
-                    note.lyric = syllable
+            handleWord()
             wordStart = lNote
             placeHolderNotes.clear()
+    handleWord()
 
 
 def parseTrack(

@@ -7,7 +7,9 @@ import numpy
 import pytest
 
 from typing import Iterable
-from .utils import midi_compare, midi_converter, env
+from .utils import midi_compare, midi_converter, env, ustx_converter
+
+test_resources_path = pathlib.Path(__file__).parent / "resources"
 
 
 @pytest.fixture
@@ -54,7 +56,6 @@ def midi_parse_and_compare(midi_converter, env, midi_compare):
     ],
 )
 def test_external_midi_parse(file_name, midi_parse_and_compare):
-    test_resources_path = pathlib.Path(__file__).parent / "resources"
     orig_file_path = test_resources_path / file_name
 
     midi_parse_and_compare(orig_file_path)
@@ -91,3 +92,26 @@ def test_scales(k, env, prepare_midi, midi_parse_and_compare):
     finally:
         if orig_file_path.exists():
             orig_file_path.unlink()
+
+
+def test_multisyllable():
+    ustx_path = test_resources_path / "test-multisyllable.ustx"
+    c = ustx_converter()
+    m_score = c.parseFile(ustx_path, hyphenLang="en_US")
+    assert len(m_score.parts) == 1, "There should be exactly one part in the score."
+    part = m_score.parts[0]
+    notes = list(part.flatten().notes)
+    assert len(notes) == 3, "There should be exactly three notes in the part."
+
+    expected_lyrics = ["lis", "ten", "ing"]
+    expected_lyric_syllabics = ["begin", "middle", "end"]
+
+    for note, expected_lyric, expected_syllabic in zip(
+        notes, expected_lyrics, expected_lyric_syllabics
+    ):
+        assert note.lyric == expected_lyric, (
+            f"Expected lyric '{expected_lyric}' but got '{note.lyric}'"
+        )
+        assert note.lyrics[0].syllabic == expected_syllabic, (
+            f"Expected syllabic '{expected_syllabic}' but got '{note.lyrics[0].syllabic}'"
+        )
