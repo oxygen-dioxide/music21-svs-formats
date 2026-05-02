@@ -14,7 +14,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "libresvip",
+  "libresvip>=2.4.0",
   "music21",
   "types_linq",
 ]

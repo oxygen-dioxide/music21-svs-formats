@@ -6,7 +6,9 @@ Music21 is designed for classical music theory, primarily centered around staff 
 ## Installation
 
 ```bash
-pip install music21_svs_formats[hyphen]
+git clone https://github.com/oxygen-dioxide/music21-svs-formats
+cd music21-svs-formats
+pip install -e .[hyphen]
 ```
 
 ## Features
