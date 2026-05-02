@@ -20,12 +20,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+hyphen = ["pyphen"]
 test = [
   "pytest",
   "pretty_midi",
   "numpy>=1.26.4",
 ]
-hyphen = ["pyphen"]
+all = [
+  "pyphen",
+  "pytest",
+  "pretty_midi",
+  "numpy>=1.26.4",
+]
 
 [project.urls]
 Homepage = "https://github.com/oxygen-dioxide/music21-svs-formats"
