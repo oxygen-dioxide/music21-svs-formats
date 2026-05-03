@@ -11,6 +11,8 @@ jobs:
       url: https://pypi.org/p/music21_svs_formats  # 成功后在 Action 界面显示的链接
     permissions:
       id-token: write
+      contents: write
+
     
     steps:
       - uses: actions/checkout@v4
