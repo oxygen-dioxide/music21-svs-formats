@@ -1,4 +1,6 @@
 # music21_svs_formats
+[English](README.md) | [简体中文](README_zh.md)
+
 Import and export Singing Voice Synthesis (SVS) project formats in [music21](https://github.com/cuthbertLab/music21) via [Libresvip](https://github.com/SoulMelody/LibreSVIP).
 
 Music21 is designed for classical music theory, primarily centered around staff notation. With this library, users can easily convert SVS project files into sheet music readable by human singers and performers, or import MusicXML files (containing lyrics) downloaded from musescore.com into SVS software.
@@ -6,9 +8,7 @@ Music21 is designed for classical music theory, primarily centered around staff 
 ## Installation
 
 ```bash
-git clone https://github.com/oxygen-dioxide/music21-svs-formats
-cd music21-svs-formats
-pip install -e .[hyphen]
+pip install music21-svs-formats[hyphen]
 ```
 
 ## Features
