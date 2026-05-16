@@ -4,7 +4,7 @@ This file provides guidance for AI agents operating in the music21-svs-formats r
 
 ## Project Overview
 
-music21-svs-formats provides support for singing voice synthesis (SVS) file formats in music21 via the LibreSVIP library. It enables conversion between music21.stream.Score and various SVS formats (USTX, VOCALOID, DeepVocal, etc.).
+music21-svs-formats provides support for singing voice synthesis (SVS) file formats in music21 via the LibreSVIP library. It enables conversion between music21.stream.Score and various SVS formats (OpenUtau, VOCALOID, DeepVocal, etc.).
 
 ## Build/Lint/Test Commands
 
